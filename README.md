@@ -1,4 +1,4 @@
-Для запуска необходимо задать переменную окружения CONFIG_PATH, в которой бует путь к config.yaml.
+Для запуска необходимо задать переменную окружения CONFIG_PATH, в которой бует путь к config.yaml.  
 Формат конфига:  
 pgsql:   
   PG_USER: "postgres"  
@@ -20,7 +20,7 @@ ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=mypassword
 ENV POSTGRES_DB=EWallet
 
-COPY /internal/repository/migrations/init.sql /docker-entrypoint-initdb.d/
+COPY /internal/repository/postgresql/migrations/init.sql /docker-entrypoint-initdb.d/
 
 EXPOSE 5432
 
