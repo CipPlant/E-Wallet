@@ -1,0 +1,12 @@
+pgsql:
+  PG_USER: "postgres"
+  PG_PASSWORD: 200112
+  PG_DATABASE: "EWallet"
+  PG_PORT: "5432"
+  PG_HOST: "localhost"
+  PG_PING_TIME: 5s
+httpServer:
+  HTTP_HOST: "localhost"
+  HTTP_PORT: 80
+logger:
+  LOG_LEVEL: "local"
