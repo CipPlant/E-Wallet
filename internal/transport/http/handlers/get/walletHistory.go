@@ -6,7 +6,6 @@ import (
 	"EWallet/internal/transport/http/handlers"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/mux"
 	"log/slog"
 	"net/http"
@@ -14,10 +13,12 @@ import (
 
 func WalletHistory(uc handlers.DatabaseUseCase, logger *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log := logger.With(
+			slog.String("handler", "WalletHistory"),
+		)
+
 		vars := mux.Vars(r)
-
 		from, ok := vars["walletID"]
-
 		if !ok {
 			http.Error(w, "Invalid URL", http.StatusBadRequest)
 			return
@@ -47,6 +48,7 @@ func WalletHistory(uc handlers.DatabaseUseCase, logger *slog.Logger) http.Handle
 				http.Error(w, outsideErrors.NoSuchDestinationWallet.Error(), http.StatusBadRequest)
 				return
 			default:
+				log.Error("internal server error:", err)
 				http.Error(w, "internal error", http.StatusInternalServerError)
 				return
 			}
@@ -54,7 +56,7 @@ func WalletHistory(uc handlers.DatabaseUseCase, logger *slog.Logger) http.Handle
 
 		jsonData, err := json.Marshal(dtoOutput)
 		if err != nil {
-			fmt.Println("err3", err)
+			log.Error("internal server error:", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -62,7 +64,8 @@ func WalletHistory(uc handlers.DatabaseUseCase, logger *slog.Logger) http.Handle
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		w.Write(jsonData)
+		if _, err := w.Write(jsonData); err != nil {
+			log.Error("responseWriter error:", err)
+		}
 	}
-
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/shopspring/decimal"
 	"log"
@@ -69,6 +70,10 @@ func (p *PGSQLRepository) CreateWallet(id, amount string) (*model.Wallet, error)
 			&resWallet.BalanceAmount)
 
 	if err != nil {
+		pgErr, ok := err.(*pgconn.PgError)
+		if ok && pgErr.SQLState() == "23505" {
+			return nil, outsideErrors.WalletAlreadyExist
+		}
 		return &model.Wallet{}, err
 	}
 
@@ -84,7 +89,6 @@ func (p *PGSQLRepository) CreateWallet(id, amount string) (*model.Wallet, error)
 func (p *PGSQLRepository) SendMoney(from, to, amount string) error {
 
 	tx, err := p.db.Begin(context.Background())
-
 	if err != nil {
 		log.Fatal(err)
 	}

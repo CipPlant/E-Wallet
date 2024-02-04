@@ -40,6 +40,10 @@ func (du *DatabaseUseCase) CreateWallet(input *model.Wallet) (dto.WalletOutput, 
 }
 
 func (du *DatabaseUseCase) SendMoney(input dto.WalletInput) error {
+	if input.WalletID == input.To {
+		return outsideErrors.NoSuchDestinationWallet
+	}
+
 	var receiverWallet model.Wallet
 	var err error
 
